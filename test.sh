@@ -16,9 +16,13 @@ checkdir() {
       fi
    fi
 
-   CONTEXT=$(/bin/ls -dZ "$1" | awk '{print $4}' | cut -d: -f3)
-   if [ "${CONTEXT}" != "svirt_sandbox_file_t" ] ; then
-      error "ERROR: SELinux context type is ${CONTEXT} instead of svirt_sandbox_file_t"
+   if [ -x /usr/sbin/getenforce ] ; then
+      if [ "$(/usr/sbin/getenforce)" = "Enforcing" ] ; then
+         CONTEXT=$(/bin/ls -dZ "$1" | awk '{print $4}' | cut -d: -f3)
+         if [ "${CONTEXT}" != "svirt_sandbox_file_t" ] ; then
+            error "ERROR: SELinux context type of $1 is ${CONTEXT} instead of svirt_sandbox_file_t"
+         fi
+      fi
    fi
 }
 
