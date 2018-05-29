@@ -2,17 +2,18 @@ FROM centos:7
 MAINTAINER Shawn Johnson <sjohnso@gmail.com>
 
 ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin
-ENV GOLANG_VERSION=1.9.3
+ENV GOLANG_VERSION=1.10.2
 
-RUN yum -y update && \
+RUN yum -y install deltarpm && \
+    yum -y update && \
     yum -y install git sudo && \
     yum -y install ncurses-devel lua-devel ctags-etags gcc make && \
     ln -rsf /usr/share/zoneinfo/CST6CDT /etc/localtime && \
     cd /tmp && \
-    git clone https://github.com/vim/vim.git && \
+    git clone --branch v8.1.0026 https://github.com/vim/vim.git && \
     cd vim && \
     ./configure --with-features=huge --enable-luainterp --enable-gui=no --without-x --prefix=/usr/local && \
-    make VIMRUNTIMEDIR=/usr/local/share/vim/vim80 && \
+    make VIMRUNTIMEDIR=/usr/local/share/vim/vim81 && \
     make install && \
     cd /usr/bin && \
     mv vi vi.orig && \
@@ -71,6 +72,8 @@ ENV GOPATH /go
 
 RUN echo "export GOLANG_VERSION=${GOLANG_VERSION}" >> ${HOME}/.bashrc && \
     echo "export GOPATH=${GOPATH}" >> ${HOME}/.bashrc && \
+    echo "export GOOS=linux" >> ${HOME}/.bashrc && \
+    echo "export GOARCH=amd64" >> ${HOME}/.bashrc && \
     echo "cd /go" >> ${HOME}/.bashrc && \
     sed -i 's/^\(PATH=$PATH:\)\(.*\)/\1\/usr\/local\/go\/bin:\2/g' ${HOME}/.bash_profile
 RUN vim +PlugInstall +qall
